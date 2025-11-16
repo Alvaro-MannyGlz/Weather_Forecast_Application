@@ -1,0 +1,268 @@
+/* -------------------------
+   Variables (tweakable)
+   ------------------------- */
+:root {
+  --max-width-7xl: 1280px;
+  --gap: 1rem; /* 16px */
+  --space-y: 1.5rem; /* 24px */
+  --radius-lg: 12px;
+  --muted-foreground: #6b7280; /* gray-500 */
+  --bg-muted: #f3f4f6; /* gray-100 */
+  --bg-slate-50: #f8fafc;
+  --bg-slate-100: #f1f5f9;
+  --bg-white: #ffffff;
+  --sky-600: #0ea5e9; /* approximate */
+  --red-50: #fff1f2;
+  --border-color: #e5e7eb;
+  --shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+               Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  --breakpoint-lg: 1024px;
+}
+
+/* -------------------------
+   Reset / base
+   ------------------------- */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: #111827;
+  background: #f8fafc;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.4;
+  font-size: 16px;
+}
+
+/* -------------------------
+   Utility-ish classes used in your JSX
+   (Re-implementing the handful of Tailwind utilities used)
+   ------------------------- */
+
+/* Container & spacing */
+.mx-auto { margin-left: auto; margin-right: auto; }
+.max-w-7xl { max-width: var(--max-width-7xl); width: 100%; }
+.space-y-6 > * + * { margin-top: var(--space-y); }
+.p-4 { padding: 1rem; }
+
+/* Flex helpers */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.text-left { text-align: left; }
+
+/* Text sizes & weights */
+.text-2xl { font-size: 1.5rem; line-height: 1.25; }
+.font-bold { font-weight: 700; }
+.font-medium { font-weight: 600; }
+.text-sm { font-size: 0.875rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xs { font-size: 0.75rem; }
+
+/* Muted text */
+.text-muted-foreground { color: var(--muted-foreground); }
+
+/* Code-like inline box used for showing API_BASE */
+.code-like,
+.bg-muted,
+.rounded,
+.rounded-xl {
+  border-radius: var(--radius-lg);
+}
+
+/* small inline code */
+.code-like {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+  background: var(--bg-muted);
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+}
+
+/* background / panels */
+.bg-muted { background: var(--bg-muted); }
+.bg-white { background: var(--bg-white); }
+.rounded { border-radius: 8px; }
+.rounded-xl { border-radius: 12px; }
+
+/* shadows and borders */
+.shadow { box-shadow: var(--shadow); }
+.border { border: 1px solid var(--border-color); }
+
+/* grid utilities and responsive behavior */
+/* Note: JSX uses the literal class "lg:grid-cols-2" which contains a colon.
+   CSS selectors for those classes must escape the colon. */
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: 1fr; }
+.grid-cols-2 { grid-template-columns: 1fr 1fr; }
+.gap-4 { gap: var(--gap); }
+
+/* escape sequences for literal classnames with colon */
+.lg\:grid-cols-2 {
+  /* default: no-op; real effect in media query below */
+}
+
+/* responsive breakpoint for lg */
+@media (min-width: var(--breakpoint-lg)) {
+  /* activate the lg:grid-cols-2 class */
+  .lg\:grid-cols-2 { grid-template-columns: 1fr 1fr; display: grid; }
+}
+
+/* list spacing */
+.space-y-2 > * + * { margin-top: 0.5rem; }
+
+/* hover helpers (classes like hover:bg-slate-50 in JSX) */
+/* selectors use the literal class "hover:bg-slate-50" (escape colon) */
+.hover\:bg-slate-50:hover { background: var(--bg-slate-50); }
+.hover\:bg-red-50:hover { background: var(--red-50); }
+
+/* specific colors used in JSX */
+.bg-slate-100 { background: var(--bg-slate-100); }
+.bg-sky-600 { background: var(--sky-600); color: white; }
+
+/* small sizing helpers */
+.p-6 { padding: 1.5rem; }
+.p-2 { padding: 0.5rem; }
+.p-4 { padding: 1rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+
+/* button-ish */
+button {
+  cursor: pointer;
+  font: inherit;
+  border: none;
+  background: transparent;
+}
+button:focus { outline: 2px solid rgba(14,165,233,0.25); outline-offset: 2px; }
+
+/* small bordered button */
+button.border {
+  border: 1px solid var(--border-color);
+  background: transparent;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+}
+
+/* utility: width-fit like w-fit (makes element shrink to content) */
+.w-fit { display: inline-block; width: auto; }
+
+/* helpers for list items and saved locations */
+.aside-saved {
+  background: var(--bg-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+/* small text-muted helper for disclaimers */
+.small-muted { font-size: 0.75rem; color: var(--muted-foreground); }
+
+/* -------------------------
+   Component-specific selectors
+   (these make the app look cohesive)
+   ------------------------- */
+
+/* Top header */
+header.flex.items-center.justify-between {
+  gap: 1rem;
+}
+
+/* Saved Locations aside uses the literal class names from JSX */
+aside.bg-white.rounded-xl.p-6.shadow {
+  background: var(--bg-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+/* Saved list items */
+ul.space-y-2 { padding: 0; list-style: none; margin: 0; }
+ul.space-y-2 li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.12s ease, transform 0.06s ease;
+}
+
+/* when the JSX applies bg-slate-100 on the current location */
+li.bg-slate-100 { background: var(--bg-slate-100); }
+
+/* hover on list items (general hover class used is hover:bg-slate-50 on the li in JSX) */
+li.hover\:bg-slate-50:hover { background: var(--bg-slate-50); }
+
+/* left part of list item (button that loads the location) */
+li button.flex-1 {
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+}
+li .font-medium { font-weight: 600; }
+
+/* the small helper line under each saved location */
+li .text-muted-foreground { font-size: 0.75rem; color: var(--muted-foreground); }
+
+/* Delete button styles (the JSX uses hover:bg-red-50) */
+li > button[onclick] {
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  border: 1px solid transparent;
+}
+li > button[onclick]:hover { background: var(--red-50); border-color: rgba(0,0,0,0.04); }
+
+/* Action buttons row below saved list */
+div.mt-4.flex.gap-2 { display: flex; gap: 0.5rem; margin-top: 1rem; }
+button.px-3.py-1 {
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+button.bg-sky-600 {
+  background: var(--sky-600);
+  color: white;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+button.bg-sky-600:hover { filter: brightness(0.95); }
+button.border { background: transparent; }
+
+/* Panels used by WeatherPanel / ForecastPanel fallback look */
+.weather-panel, .forecast-panel {
+  background: var(--bg-white);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+  margin-top: 1rem;
+}
+
+/* Footer */
+footer.pt-8 { padding-top: 2rem; text-align: center; font-size: 0.75rem; color: var(--muted-foreground); }
+
+/* -------------------------
+   Accessibility & small polish
+   ------------------------- */
+button[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* small responsive tweak for top grid: use single column under lg */
+@media (max-width: calc(var(--breakpoint-lg) - 1px)) {
+  .grid.grid-cols-1 { grid-template-columns: 1fr; }
+}
+
+/* make the outermost container look centered and slight max width */
+.app-root {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: var(--max-width-7xl);
+  padding: 1rem;
+}
+
+/* give the top header a little vertical spacing when on small screens */
+@media (max-width: 600px) {
+  header.flex.items-center.justify-between { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+}
