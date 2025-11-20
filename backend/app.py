@@ -1,59 +1,86 @@
+import sys
 import os
-import logging
-from flask import Flask, request, Response, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
-import requests
-from dotenv import load_dotenv
 
-# Load .env
-load_dotenv()
+# 1. SETUP PATHS
+# Get the folder where this script runs (the 'backend' folder)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Add 'backend' to the system path so Python can find the 'src' folder inside it
+sys.path.append(current_dir)
 
-WEATHERAPI_KEY = os.environ.get("WEATHERAPI_KEY", "")
-if not WEATHERAPI_KEY:
-    logging.warning("WEATHERAPI_KEY is not set. Requests will likely fail.")
+# 2. IMPORTS
+# We removed "server." because we are already inside the backend folder
+from src.config.database import SessionLocal, engine, Base
+from src.models.saved_location import SavedLocation 
 
-DEFAULT_PORT = int(os.environ.get("PORT", 3001))
-TIMEOUT = float(os.environ.get("UPSTREAM_TIMEOUT", 10.0))
-
+# 3. APP SETUP
 app = Flask(__name__)
-CORS(app)  # allow cross-origin for dev
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# Basic logging
-logging.basicConfig(level=logging.INFO)
-app.logger.info("Logging initialized.")
+# Create tables if they don't exist
+Base.metadata.create_all(bind=engine)
 
-
-def forward_to_weatherapi(endpoint: str):
-    """Forward request to WeatherAPI, inject server-side API key."""
-    params = dict(request.args)
-    params["key"] = WEATHERAPI_KEY
-    upstream = f"https://api.weatherapi.com/v1/{endpoint}.json"
-
+# --- Helper: Get DB Session ---
+def get_db():
+    db = SessionLocal()
     try:
-        resp = requests.get(upstream, params=params, timeout=TIMEOUT)
-    except requests.RequestException as exc:
-        app.logger.error("Upstream request failed: %s", exc)
-        return jsonify({"error": "Failed to contact WeatherAPI"}), 502
+        return db
+    finally:
+        db.close()
 
-    content_type = resp.headers.get("Content-Type", "application/json")
-    return Response(resp.content, status=resp.status_code, content_type=content_type)
+# --- Routes ---
 
+@app.route('/api/saved-locations', methods=['GET'])
+def get_locations():
+    """Get all saved cities"""
+    session = SessionLocal()
+    try:
+        locations = session.query(SavedLocation).all()
+        results = [{"id": loc.id, "city": loc.city} for loc in locations]
+        return jsonify(results)
+    finally:
+        session.close()
 
-@app.route("/current.json")
-def current():
-    return forward_to_weatherapi("current")
+@app.route('/api/saved-locations', methods=['POST'])
+def add_location():
+    """Save a new city"""
+    data = request.json
+    city_name = data.get("city")
+    
+    if not city_name:
+        return jsonify({"error": "City name is required"}), 400
 
+    session = SessionLocal()
+    try:
+        exists = session.query(SavedLocation).filter_by(city=city_name).first()
+        if exists:
+            return jsonify({"message": "City already saved"}), 200
 
-@app.route("/forecast.json")
-def forecast():
-    return forward_to_weatherapi("forecast")
+        new_loc = SavedLocation(city=city_name)
+        session.add(new_loc)
+        session.commit()
+        return jsonify({"message": f"Saved {city_name}"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        session.close()
 
+@app.route('/api/saved-locations/<city_name>', methods=['DELETE'])
+def delete_location(city_name):
+    """Delete a city"""
+    session = SessionLocal()
+    try:
+        loc = session.query(SavedLocation).filter_by(city=city_name).first()
+        if not loc:
+            return jsonify({"error": "City not found"}), 404
+            
+        session.delete(loc)
+        session.commit()
+        return jsonify({"message": "Deleted"}), 200
+    finally:
+        session.close()
 
-@app.route("/health")
-def health():
-    return jsonify({"ok": True})
-
-
-if __name__ == "__main__":
-    app.logger.info(f"Starting Flask Weather proxy on 0.0.0.0:{DEFAULT_PORT}")
-    app.run(host="0.0.0.0", port=DEFAULT_PORT, debug=False)
+if __name__ == '__main__':
+    print("🚀 Server starting on http://localhost:5000")
+    app.run(debug=True, port=5000)
