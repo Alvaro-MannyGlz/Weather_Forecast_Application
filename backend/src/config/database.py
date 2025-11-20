@@ -14,7 +14,7 @@ DB_NAME = os.getenv('DB_NAME', 'weather_app')
 DB_USER = os.getenv('DB_USER', 'postgres')
 DB_PASSWORD = os.getenv('DB_PASSWORD', 'password123')
 
-# Priority: Use explicit DATABASE_URL from .env if it exists, otherwise build it.
+# DATABASE_URL from .env
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
@@ -22,7 +22,6 @@ if not DATABASE_URL:
 def get_db_connection():
     """
     Establishes a raw connection to the PostgreSQL database using environment variables.
-    Returns: A psycopg2 connection object or None if the connection fails.
     """
     try:
         # Establish the connection using psycopg2
@@ -53,11 +52,11 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # Optional: Self-test block 
-# if __name__ == '__main__':
-#     print("Attempting to connect to the database...")
-#     conn = get_db_connection()
-#     if conn:
-#         print("SUCCESS: Raw Database connection established!")
-#         conn.close()
-#     else:
-#         print("FAILURE: Could not connect to the database.")
+if __name__ == '__main__':
+    print("Attempting to connect to the database...")
+    conn = get_db_connection()
+    if conn:
+        print("SUCCESS: Raw Database connection established!")
+        conn.close()
+    else:
+        print("FAILURE: Could not connect to the database.")

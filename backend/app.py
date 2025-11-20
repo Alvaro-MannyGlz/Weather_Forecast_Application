@@ -3,14 +3,13 @@ import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-# 1. SETUP PATHS (MUST be before importing from src)
+# 1. SETUP PATHS
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
-# 2. IMPORTS (Now safe to import from src)
+# 2. IMPORTS 
 from src.config.database import SessionLocal, engine, Base
 from src.models.saved_location import SavedLocation 
-# FIX: Moved this import down here so Python knows where to find it
 from src.services.weather_api import get_weather_data 
 
 # 3. APP SETUP
@@ -19,8 +18,6 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Create tables if they don't exist
 Base.metadata.create_all(bind=engine)
-
-# --- Routes ---
 
 # --- WEATHER ROUTE ---
 @app.route('/api/weather/<city_name>', methods=['GET'])
@@ -35,7 +32,6 @@ def get_weather(city_name):
         return jsonify(data), status
 
     return jsonify(data)
-# ---------------------
 
 @app.route('/api/saved-locations', methods=['GET'])
 def get_locations():

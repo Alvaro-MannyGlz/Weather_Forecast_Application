@@ -80,7 +80,7 @@ const ForecastPanel = ({ data, loading, error }) => {
                 <div className="flex items-center gap-2 text-slate-400 mb-2 text-xs font-bold uppercase tracking-wider">
                     <Thermometer className="w-4 h-4" /> Insight
                 </div>
-                <div className="text-md font-medium text-slate-700">
+                <div className="text-md font-medium text-slate-700"> 
                     {data.temp > 85 ? "It's hot out there! Stay hydrated." : data.temp < 50 ? "It's a bit chilly. Grab a jacket." : "The weather is looking great today."}
                 </div>
             </div>
