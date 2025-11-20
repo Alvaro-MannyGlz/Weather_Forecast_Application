@@ -1,11 +1,11 @@
-# Weather_Forecast_Application
-# [Project Name: ???]
+# WeatherOrNot
+## Weather_Forecast_Application
 
-## ⚡ Real-time Weather Forecast Application ☁️
+### ⚡ Real-time Weather Forecast Application ☁️
 
 **Repository Description:** A responsive, modern web application for retrieving and visualizing real-time and multi-day weather forecasts for any location worldwide. Built with React and powered by OpenWeatheMap to deliver reliable and aesthetically pleasing weather data.
 
-### ✨ Features
+#### ✨ Features
 
 * **Global Search:** Look up weather by city name, ZIP code, or latitude/longitude.
 * **Current Conditions:** Displays temperature, humidity, wind speed/direction, and atmospheric pressure.
@@ -22,9 +22,6 @@
 * **Styling:** CSS Modules / Tailwind CSS / Styled Components (subject to change)
 * **Data Handling:** Axios for HTTP requests, Redis for Caching (subject to change)
 
-### 🚀 Getting Started
-TBD
-
-## People Responsible 
+### People Responsible 
 - Alvaro Gonzalez
 - Ben Johnson-Gomez
