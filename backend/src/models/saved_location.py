@@ -4,7 +4,7 @@ from src.config.database import Base
 
 class SavedLocation(Base):
     # 1. The name of the table in PostgreSQL
-    __tablename__ = "saved_locations"
+    __tablename__ = "Locations"
 
     # 2. The Columns
     id = Column(Integer, primary_key=True, index=True)

@@ -3,16 +3,15 @@ import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-# 1. SETUP PATHS
-# Get the folder where this script runs (the 'backend' folder)
+# 1. SETUP PATHS (MUST be before importing from src)
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# Add 'backend' to the system path so Python can find the 'src' folder inside it
 sys.path.append(current_dir)
 
-# 2. IMPORTS
-# We removed "server." because we are already inside the backend folder
+# 2. IMPORTS (Now safe to import from src)
 from src.config.database import SessionLocal, engine, Base
 from src.models.saved_location import SavedLocation 
+# FIX: Moved this import down here so Python knows where to find it
+from src.services.weather_api import get_weather_data 
 
 # 3. APP SETUP
 app = Flask(__name__)
@@ -21,15 +20,22 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 # Create tables if they don't exist
 Base.metadata.create_all(bind=engine)
 
-# --- Helper: Get DB Session ---
-def get_db():
-    db = SessionLocal()
-    try:
-        return db
-    finally:
-        db.close()
-
 # --- Routes ---
+
+# --- WEATHER ROUTE ---
+@app.route('/api/weather/<city_name>', methods=['GET'])
+def get_weather(city_name):
+    """Get real weather data for a specific city"""
+    # This calls the function in services/weather_api.py
+    data = get_weather_data(city_name)
+
+    if "error" in data:
+        # Return 404 if city not found, or 500 if API key is missing
+        status = 404 if "not found" in data.get("error", "").lower() else 500
+        return jsonify(data), status
+
+    return jsonify(data)
+# ---------------------
 
 @app.route('/api/saved-locations', methods=['GET'])
 def get_locations():

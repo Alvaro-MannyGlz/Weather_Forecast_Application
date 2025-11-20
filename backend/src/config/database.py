@@ -1,63 +1,63 @@
-import psycopg
 import os
+import psycopg2 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv, find_dotenv
+
+# 1. Load environment variables
+load_dotenv(find_dotenv())
+
+# Retrieve individual connection details
+DB_HOST = os.getenv('DB_HOST', 'localhost')
+DB_PORT = os.getenv('DB_PORT', '5432')
+DB_NAME = os.getenv('DB_NAME', 'weather_app')
+DB_USER = os.getenv('DB_USER', 'postgres')
+DB_PASSWORD = os.getenv('DB_PASSWORD', 'password123')
+
+# Priority: Use explicit DATABASE_URL from .env if it exists, otherwise build it.
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 def get_db_connection():
     """
-    Establishes a connection to the PostgreSQL database using environment variables.
-
-    Returns:
-        A psycopg connection object or None if the connection fails.
+    Establishes a raw connection to the PostgreSQL database using environment variables.
+    Returns: A psycopg2 connection object or None if the connection fails.
     """
-    # Retrieve connection details from environment variables
-    db_host = os.getenv('DB_HOST')
-    db_port = os.getenv('DB_PORT')
-    db_name = os.getenv('DB_NAME')
-    db_user = os.getenv('DB_USER')
-    db_password = os.getenv('DB_PASSWORD')
-
     try:
-        # Establish the connection
-        conn = psycopg.connect(
-            host=db_host,
-            port=db_port,
-            dbname=db_name,
-            user=db_user,
-            password=db_password
+        # Establish the connection using psycopg2
+        conn = psycopg2.connect(
+            host=DB_HOST,
+            port=DB_PORT,
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD
         )
         return conn
     
-    except psycopg.Error as e:
+    except psycopg2.Error as e:
         # Print a descriptive error message if the connection fails
         print(f"--- DATABASE CONNECTION ERROR ---")
         print(f"Failed to connect to PostgreSQL. Check .env variables and ensure the server is running.")
         print(f"Details: {e}")
         return None
 
-    # Code block below was made to test if connection was successful (it was)
-# if __name__ == '__main__':
-#     from dotenv import load_dotenv
+# 3. Create the Engine (The connection to Postgres for ORM)
+# echo=True is useful for debugging SQL queries, set to False in production
+engine = create_engine(DATABASE_URL, echo=False)
 
-#     # 1. Load environment variables (CRITICAL for testing)
-#     load_dotenv() 
-    
+# 4. Create the SessionLocal (The factory that creates sessions)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# 5. Create the Base (Used by your models)
+Base = declarative_base()
+
+# Optional: Self-test block 
+# if __name__ == '__main__':
 #     print("Attempting to connect to the database...")
-    
 #     conn = get_db_connection()
-    
 #     if conn:
-#         print("SUCCESS: Database connection established!")
-        
-#         try:
-#             # Optional: Execute a simple query to confirm database responsiveness
-#             cursor = conn.cursor()
-#             cursor.execute('SELECT 1 + 1;')
-#             result = cursor.fetchone()
-#             print(f"   Test Query Result: {result}")
-#             cursor.close()
-#         except Exception as e:
-#             print(f" WARNING: Failed to execute simple query: {e}")
-#         finally:
-#             conn.close()
-#             print("   Connection closed gracefully.")
+#         print("SUCCESS: Raw Database connection established!")
+#         conn.close()
 #     else:
-#         print("FAILURE: Could not connect to the database. Check logs above.")
+#         print("FAILURE: Could not connect to the database.")
