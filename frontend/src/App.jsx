@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Search, MapPin, Trash2, Save, Cloud, Sun, CloudRain } from "lucide-react";
 
 // --- Inline Components ---
-// (You can move these to separate files in src/panels/ later if you want)
 
 const LocationsPanel = ({ onSelectLocation }) => {
   const [inputValue, setInputValue] = useState("");

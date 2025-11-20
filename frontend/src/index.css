@@ -15,37 +15,3 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
-
-**`frontend/src/App.css`** (Custom animations)
-```css
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
-
-.weather-icon-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-**`frontend/src/main.jsx`** (Entry point)
-```jsx
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
-import './App.css'
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)

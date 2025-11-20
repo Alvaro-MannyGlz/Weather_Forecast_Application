@@ -8,7 +8,7 @@ export default defineConfig({
     proxy: {
       // Matches any request starting with /api
       '/api': {
-        target: 'http://127.0.0.1:5000', // YOUR PYTHON SERVER PORT HERE
+        target: 'http://127.0.0.1:5000', // Python port
         changeOrigin: true,
         secure: false,
         // Optional: Rewrite removes '/api' before sending to backend
