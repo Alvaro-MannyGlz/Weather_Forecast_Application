@@ -1,0 +1,206 @@
+/* === LocationsPanel === */
+.locations-search {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.locations-search input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.locations-search button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.saved-list {
+  margin-top: 16px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.saved-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #f9fafb;
+  cursor: pointer;
+}
+
+.saved-item.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.delete-btn {
+  color: #c53030;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* === ForecastPanel === */
+
+.forecast-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.forecast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.forecast-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.forecast-sub {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Slider container that clips overflow but allows horizontal scroll inside the track */
+.forecast-slider-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* The horizontally scrollable track */
+.forecast-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 6px 2px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar but keep it accessible (for visual cleanliness) */
+.forecast-track::-webkit-scrollbar {
+  height: 8px;
+}
+.forecast-track::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+}
+.forecast-track {
+  scrollbar-width: thin; /* firefox */
+  scrollbar-color: rgba(0,0,0,0.12) transparent;
+}
+
+/* Each day card */
+.forecast-day {
+  background: #f8fafc; /* light card bg */
+  border: 1px solid #e6eef6;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Inner typography */
+.day-week {
+  font-size: 13px;
+  color: #374151;
+}
+.day-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+}
+.day-temp {
+  font-weight: 700;
+  font-size: 16px;
+}
+.day-desc {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Slider buttons */
+.forecast-controls {
+  display: flex;
+  gap: 8px;
+}
+.slider-button {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+.slider-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ensure responsiveness so the track fits nicely */
+@media (max-width: 520px) {
+  .forecast-day { padding: 8px; }
+  .day-temp { font-size: 15px; }
+}
+
+/* === TodoPanel === */
+
+.todo-form {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
+}
+
+.todo-form input[type="text"],
+.todo-form input[type="date"] {
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+.todo-add-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.todo-list {
+  margin-top: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.todo-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f9f9f9;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 8px;
+}
