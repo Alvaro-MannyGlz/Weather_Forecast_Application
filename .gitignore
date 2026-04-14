@@ -208,6 +208,20 @@ __marimo__/
 
 # .gitignore
 .env
+.env.*
+!.env.example
 venv/
 __pycache__/
 node_modules/
+
+# Project runtime artifacts
+backend/weather_app.db
+backend/*.db
+backend/*.db-journal
+backend/*.sqlite3
+backend/instance/
+
+# Frontend env files
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
