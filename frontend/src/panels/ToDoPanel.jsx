@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Cloud, Sun, CloudRain, Trash2 } from "lucide-react";
+import { ListTodo, Sun, CloudRain, Trash2 } from "lucide-react";
 import { getMockWeatherForDate } from "./weather";
 import "./panelStyles.css";
 
@@ -9,6 +9,8 @@ export default function TodoPanel({ defaultLocation }) {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [tasks, setTasks] = useState([]);
+  const completedTasks = tasks.filter((task) => task.done).length;
+  const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
 
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -46,92 +48,109 @@ export default function TodoPanel({ defaultLocation }) {
     setTasks((prev) => prev.filter((t) => t.id !== id));
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-medium flex items-center gap-2">
-          <Cloud className="w-4 h-4 text-slate-500" />
-          WON To-Do List
-        </h2>
-        <span className="text-xs text-slate-500">
-          Location: <strong>{defaultLocation}</strong>
-        </span>
+    <div className="todo-panel-card animate-fade-in">
+      <div className="todo-panel-header">
+        <div>
+          <h2 className="todo-panel-title">
+            <ListTodo className="w-4 h-4" />
+            WON Checklist
+          </h2>
+          <p className="todo-panel-subtitle">Track tasks with the weather for your current location.</p>
+        </div>
+
+        <div className="todo-panel-meta">
+          <span className="todo-panel-chip">
+            {completedTasks}/{tasks.length || 0} complete
+          </span>
+          <span className="todo-panel-location">
+            Location: <strong>{defaultLocation}</strong>
+          </span>
+        </div>
       </div>
 
-      <form onSubmit={addTask} className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
-        <input
+      <div className="todo-progress">
+        <div className="todo-progress-bar">
+          <div className="todo-progress-fill" style={{ width: `${progress}%` }} />
+        </div>
+        <span className="todo-progress-label">{progress}% finished</span>
+      </div>
+
+      <form onSubmit={addTask} className="todo-form">
+        <textarea
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="New task..."
-          className="col-span-2 px-3 py-2 border border-slate-200 rounded-lg"
+          placeholder="Add a checklist item..."
+          className="todo-input todo-input-title"
+          rows={2}
         />
-        <div className="flex gap-2">
+
+        <div className="todo-form-actions">
           <input
             type="date"
-            className="px-3 py-2 border border-slate-200 rounded-lg"
+            className="todo-input todo-input-date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+
+          <button type="submit" className="todo-add-btn">
             Add
           </button>
         </div>
       </form>
 
-      <div className="space-y-2 max-h-[280px] overflow-y-auto pr-2">
+      <div className="todo-list">
         {tasks.length === 0 ? (
-          <p className="text-center text-slate-400 py-8">
+          <p className="todo-empty-state">
             No tasks yet. Add one!
           </p>
         ) : (
           tasks.map((task) => {
             const w = getMockWeatherForDate(task.date);
+            const checkboxId = `todo-checkbox-${task.id}`;
             return (
               <div
                 key={task.id}
-                className={`flex items-center justify-between p-3 rounded-lg border transition ${
-                  task.done
-                    ? "bg-slate-50 border-slate-100 opacity-80"
-                    : "bg-white hover:bg-slate-50"
-                }`}
+                className={`todo-item ${task.done ? "is-complete" : ""}`}
               >
-                <div className="flex items-start gap-3 flex-1">
-                  <input
-                    type="checkbox"
-                    checked={task.done}
-                    onChange={() => toggleDone(task.id)}
-                    className="mt-1"
-                  />
+                <div className="todo-item-main">
+                  <div className="checkbox-wrapper-12 todo-checkbox-wrap">
+                    <div className="cbx">
+                      <input
+                        id={checkboxId}
+                        type="checkbox"
+                        checked={task.done}
+                        onChange={() => toggleDone(task.id)}
+                      />
+                      <label htmlFor={checkboxId} />
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M5 12.5l4 4L19 7.5" />
+                      </svg>
+                    </div>
+                  </div>
 
-                  <div>
-                    <p
-                      className={`font-medium ${
-                        task.done ? "line-through text-slate-400" : ""
-                      }`}
-                    >
+                  <div className="todo-item-copy">
+                    <p className={`todo-item-title ${task.done ? "is-complete" : ""}`}>
                       {task.title}
                     </p>
 
-                    <p className="text-xs text-slate-400 flex items-center gap-2 mt-1">
-                      {new Date(task.date).toLocaleDateString()} •
-                      <span className="flex items-center gap-1">
-                        {w.icon === "sun" && (
-                          <Sun className="w-4 h-4 text-amber-500" />
-                        )}
-                        {w.icon === "cloud" && (
-                          <Cloud className="w-4 h-4 text-slate-400" />
-                        )}
-                        {w.icon === "rain" && (
-                          <CloudRain className="w-4 h-4 text-blue-500" />
-                        )}
-                        {w.temp}° • {w.label}
+                    <div className="todo-item-details">
+                      <span>{new Date(task.date).toLocaleDateString()}</span>
+                      <span className="todo-dot">•</span>
+                      <span className="todo-weather-badge">
+                        {w.icon === "sun" && <Sun className="w-4 h-4 text-amber-500" />}
+                        {w.icon === "cloud" && <Cloud className="w-4 h-4 text-slate-400" />}
+                        {w.icon === "rain" && <CloudRain className="w-4 h-4 text-blue-500" />}
+                        {w.temp}° {w.label}
                       </span>
-                    </p>
+                    </div>
                   </div>
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => removeTask(task.id)}
-                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
+                  className="todo-delete-btn"
+                  aria-label={`Delete task ${task.title}`}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
