@@ -1,32 +1,50 @@
 import React, { useRef, useEffect, useState, useMemo } from "react";
-import { Sun, CloudRain } from "lucide-react";
+import { Sun, CloudRain, Cloud, AlertCircle } from "lucide-react";
+import { useForecast } from "../hooks/useWeather";
 import "./panelStyles.css";
 
+/**
+ * ForecastPanel - Displays 7-day forecast with scrollable forecast cards
+ */
 export default function ForecastPanel({ location = "Unknown" }) {
+  const { forecast, loading, error } = useForecast(location);
   const containerRef = useRef(null);
   const trackRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [visibleCount, setVisibleCount] = useState(3);
   const gap = 12; // px between items
 
-  // build 7 days dataset
+  // Compute forecast days data
   const days = useMemo(() => {
-    const arr = [];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(Date.now() + i * 86400000);
-      arr.push({
-        id: i,
-        weekday: d.toLocaleDateString(undefined, { weekday: "short" }),
-        dateStr: d.toLocaleDateString(),
-        temp: 68 + i * 1.5,
-        isRain: i % 3 === 0,
-        desc: i % 3 === 0 ? "Rainy" : i % 2 === 0 ? "Sunny" : "Cloudy",
-      });
+    if (!forecast || !forecast.forecast) {
+      return [];
     }
-    return arr;
-  }, []);
+    return forecast.forecast.map((day, index) => ({
+      id: index,
+      date: day.date,
+      weekday: day.weekday,
+      maxTemp: day.max_temp_f,
+      minTemp: day.min_temp_f,
+      condition: day.condition,
+      chanceOfRain: day.chance_of_rain,
+      isRain: day.chance_of_rain > 30,
+      icon: getWeatherIcon(day.condition),
+    }));
+  }, [forecast]);
 
-  // compute visibleCount based on container width
+  // Get weather icon based on condition
+  function getWeatherIcon(condition) {
+    const lowerCondition = condition.toLowerCase();
+    if (lowerCondition.includes("rain") || lowerCondition.includes("drizzle")) {
+      return "rain";
+    }
+    if (lowerCondition.includes("cloud")) {
+      return "cloud";
+    }
+    return "sun";
+  }
+
+  // Compute visibleCount based on container width
   useEffect(() => {
     function recompute() {
       const el = containerRef.current;
@@ -34,8 +52,7 @@ export default function ForecastPanel({ location = "Unknown" }) {
       const w = el.clientWidth || 0;
       setContainerWidth(w);
 
-      // responsive visible counts:
-      // desktop wide: 5, large:4, medium:3, small:2, tiny:1
+      // responsive visible counts
       if (w >= 1200) setVisibleCount(5);
       else if (w >= 1000) setVisibleCount(4);
       else if (w >= 700) setVisibleCount(3);
@@ -48,7 +65,7 @@ export default function ForecastPanel({ location = "Unknown" }) {
     return () => window.removeEventListener("resize", recompute);
   }, []);
 
-  // item width such that exactly visibleCount items fit (account gap)
+  // item width calculation
   const itemWidth = Math.max(
     100,
     Math.floor((containerWidth - gap * (visibleCount - 1)) / visibleCount)
@@ -86,61 +103,88 @@ export default function ForecastPanel({ location = "Unknown" }) {
     };
   }, [itemWidth, visibleCount, days.length]);
 
+  if (error) {
+    return (
+      <div className="forecast-panel">
+        <div className="error-message">
+          <AlertCircle size={24} />
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="forecast-panel">
       <div className="forecast-header">
         <div>
           <h3 className="forecast-title">{location}</h3>
-          <div className="forecast-sub">7-day forecast</div>
+          <div className="forecast-sub">
+            {loading ? "Loading forecast..." : "7-day forecast"}
+          </div>
         </div>
 
         <div className="forecast-controls">
           <button
             className="slider-button"
             onClick={() => scrollByPage(-1)}
-            aria-hidden={!canScrollLeft}
             disabled={!canScrollLeft}
-            title="Scroll left"
+            aria-label="Scroll left"
           >
-            ‹
+            ←
           </button>
           <button
             className="slider-button"
             onClick={() => scrollByPage(1)}
-            aria-hidden={!canScrollRight}
             disabled={!canScrollRight}
-            title="Scroll right"
+            aria-label="Scroll right"
           >
-            ›
+            →
           </button>
         </div>
       </div>
 
-      <div ref={containerRef} className="forecast-slider-container">
-        <div
-          ref={trackRef}
-          className="forecast-track"
-          style={{ gap: `${gap}px`, paddingBottom: 4 }}
-        >
-          {days.map((d) => (
-            <div
-              key={d.id}
-              className="forecast-day"
-              style={{
-                minWidth: `${itemWidth}px`,
-                maxWidth: `${itemWidth}px`,
-              }}
-            >
-              <div className="day-week">{d.weekday}</div>
+      <div className="forecast-container" ref={containerRef}>
+        <div className="forecast-track" ref={trackRef}>
+          {loading ? (
+            <div className="forecast-loading">Loading...</div>
+          ) : days.length === 0 ? (
+            <div className="forecast-empty">No forecast data available</div>
+          ) : (
+            days.map((day) => (
+              <div
+                key={day.id}
+                className="forecast-card"
+                style={{ width: `${itemWidth}px` }}
+              >
+                <div className="forecast-date">
+                  <div className="forecast-weekday">{day.weekday}</div>
+                  <div className="forecast-datestr">{day.date}</div>
+                </div>
 
-              <div className="day-icon">
-                {d.isRain ? <CloudRain size={30} /> : <Sun size={30} />}
+                <div className="forecast-icon">
+                  {day.icon === "rain" ? (
+                    <CloudRain size={32} className="icon-rain" />
+                  ) : day.icon === "cloud" ? (
+                    <Cloud size={32} className="icon-cloud" />
+                  ) : (
+                    <Sun size={32} className="icon-sun" />
+                  )}
+                </div>
+
+                <div className="forecast-condition">{day.condition}</div>
+
+                <div className="forecast-temps">
+                  <div className="temp-max">{day.maxTemp}°</div>
+                  <div className="temp-min">{day.minTemp}°</div>
+                </div>
+
+                <div className="forecast-rain">
+                  <span>💧 {day.chanceOfRain}%</span>
+                </div>
               </div>
-
-              <div className="day-temp">{Math.round(d.temp)}°</div>
-              <div className="day-desc">{d.desc}</div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
