@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, String
 from src.config.database import Base
 
 class SavedLocation(Base):
-    # 1. The name of the table in PostgreSQL
+    # 1. The table name used by SQLAlchemy
     __tablename__ = "Locations"
 
     # 2. The Columns
