@@ -215,6 +215,7 @@ __pycache__/
 node_modules/
 
 # Project runtime artifacts
+weather_app.db
 backend/weather_app.db
 backend/*.db
 backend/*.db-journal
