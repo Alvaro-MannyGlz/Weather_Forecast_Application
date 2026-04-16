@@ -60,6 +60,11 @@ WeatherOrNot/
 │           ├── ForecastPanel.jsx
 │           ├── LocationsPanel.jsx
 │           └── ToDoPanel.jsx
+├── docs/
+│   ├── README.md
+│   ├── architecture.md
+│   ├── api-reference.md
+│   └── setup-notes.md
 ├── .env.example
 ├── requirements.txt
 └── README.md
